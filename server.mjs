@@ -38,6 +38,20 @@ app.get('/api/decks/:deckId/cards', (req, res) => {
     const cards = db.prepare('SELECT id, front, back FROM Card WHERE deck = ?').all(deckId);
     res.json(cards);
 });
+//new deck
+app.post('/api/decks', express.json(), (req, res) => { 
+    const { name } = req.body;
+    const result = db.prepare('INSERT INTO Deck (name) VALUES (?)').run(name);
+    res.json({ id: result.lastInsertRowid });
+});
+//new flashcards
+app.post('/api/decks/:deckId/cards', express.json(), (req, res) => {
+    const { deckId } = req.params;
+    const { front, back } = req.body;
+    const result = db.prepare('INSERT INTO Card (front, back, deck) VALUES (?, ?, ?)').run(front, back, deckId);
+    res.json({ id: result.lastInsertRowid });
+});
+
 
 function main() {
     let db = new Database('flashcards.db', {});
