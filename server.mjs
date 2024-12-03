@@ -28,6 +28,16 @@ function initializeSchema(db) {
     ).run();
 }
 
+app.get('/api/decks', (req, res) => {
+    const decks = db.prepare('SELECT id, name FROM Deck').all();
+    res.json(decks);
+});
+
+app.get('/api/decks/:deckId/cards', (req, res) => {
+    const { deckId } = req.params;
+    const cards = db.prepare('SELECT id, front, back FROM Card WHERE deck = ?').all(deckId);
+    res.json(cards);
+});
 
 function main() {
     let db = new Database('flashcards.db', {});
