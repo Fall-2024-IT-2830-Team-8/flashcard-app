@@ -99,7 +99,7 @@
         async function fetchDecks() {
             const response = await fetch('/api/decks');
             const decks = await response.json();
-            decksSelect.innerHTML = decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
+            decksSelect.innerHTML = decks.decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
             currentDeckId = decks[0]?.id || null;
             if (currentDeckId) fetchCards(currentDeckId);
         }
@@ -107,7 +107,7 @@
         // Fetch cards for a selected deck
         async function fetchCards(deckId) {
             const response = await fetch(`/api/decks/${deckId}/cards`);
-            currentCards = await response.json();
+            currentCards = await response.json().cards;
             currentCardIndex = 0;
             if (currentCards.length) {
                 showCard(currentCardIndex);

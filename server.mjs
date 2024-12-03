@@ -49,33 +49,25 @@ function getDecks(db) {
     return result;
 }
 
-app.get('/api/decks', (req, res) => {
-    const decks = db.prepare('SELECT id, name FROM Deck').all();
-    res.json(decks);
-});
+function createCard(db, deckId, front, back) {
+    const result = db.prepare(`
+        INSERT INTO Card (deck, front, back) VALUES (@deckId, @front, @back);
+    `).run({ deckId: BigInt(deckId), front: front, back: back });
+    return result.lastInsertRowid;
+}
 
-app.get('/api/decks/:deckId/cards', (req, res) => {
-    const { deckId } = req.params;
-    const cards = db.prepare('SELECT id, front, back FROM Card WHERE deck = ?').all(deckId);
-    res.json(cards);
-});
-//new deck
-app.post('/api/decks', express.json(), (req, res) => { 
-    const { name } = req.body;
-    const result = db.prepare('INSERT INTO Deck (name) VALUES (?)').run(name);
-    res.json({ id: result.lastInsertRowid });
-});
-//new flashcards
-app.post('/api/decks/:deckId/cards', express.json(), (req, res) => {
-    const { deckId } = req.params;
-    const { front, back } = req.body;
-    const result = db.prepare('INSERT INTO Card (front, back, deck) VALUES (?, ?, ?)').run(front, back, deckId);
-    res.json({ id: result.lastInsertRowid });
-});
+function getCardsInDeck(db, deckId) {
+    const result = db.prepare(`
+        SELECT c.id, c.front, c.back
+        FROM Card c
+        WHERE c.deck = @deckId;
+    `).all({ deckId: deckId });
+    return result;
+}
 
 
 function main() {
-    let db = new Database('flashcards.db', {});
+    let db = new Database('flashcards.db', { verbose: console.debug });
     db.pragma('journal_mode = WAL') // No clue what this does but the [README](https://www.npmjs.com/package/better-sqlite3) says it's recommended for performance
 
     initializeSchema(db);
@@ -88,16 +80,15 @@ function main() {
     });
 
     app.post('/api/decks', (request, response) => {
-        const initArgs = request.body;
-        console.log(initArgs);
+        const { name } = request.body;
 
-        if (initArgs.name === undefined) {
+        if (name === undefined) {
             response.status(400);
             response.json({ 'status': 'failure', 'error': 'Decks require a name.' });
             return;
         }
 
-        let deckId = createDeck(db, initArgs.name);
+        let deckId = createDeck(db, name);
         response.status(200);
         response.json({ 'status': 'success', 'deckId': deckId });
     });
@@ -106,6 +97,33 @@ function main() {
         let decks = getDecks(db);
         response.status(200);
         response.json({ 'status': 'success', 'decks': decks });
+    });
+
+    app.get('/api/decks/:deckId/cards', (request, response) => {
+        const { deckId } = request.params;
+
+        let cards = getCardsInDeck(db, deckId);
+        response.status(200);
+        response.json({ 'status': 'success', 'cards': cards });
+    });
+
+    app.post('/api/decks/:deckId/cards', (request, response) => {
+        const { front, back } = request.body;
+        let { deckId } = request.params;
+
+        deckId = parseInt(deckId);
+
+        console.log([deckId, front, back]);
+
+        if ([front, back].includes(undefined) || deckId === NaN) {
+            response.status(400);
+            response.json({ 'status': 'failure', 'error': 'Card requires a deckId, front, and back.' });
+            return;
+        }
+
+        let cardId = createCard(db, deckId, front, back);
+        response.status(200);
+        response.json({ 'status': 'success', 'cardId': cardId });
     });
 
     app.listen(PORT, () => console.log(`listening on port ${PORT}`));
