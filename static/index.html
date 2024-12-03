@@ -1,6 +1,100 @@
 <!DOCTYPE html>
-<html>
-    <body>
-        <p>Something flashy</p>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #decks {
+            margin-bottom: 20px;
+        }
+        .flashcard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            height: 200px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flashcards</h1>
+    <label for="decks">Choose a Deck:</label>
+    <select id="decks">
+        <!-- Decks will be dynamically populated -->
+    </select>
+    <div id="flashcard" class="flashcard hidden">
+        <div id="front" class="card-side"></div>
+        <div id="back" class="card-side hidden"></div>
+    </div>
+
+    <script>
+        const decksSelect = document.getElementById('decks');
+        const flashcard = document.getElementById('flashcard');
+        const front = document.getElementById('front');
+        const back = document.getElementById('back');
+
+        let currentDeckId = null;
+        let currentCards = [];
+        let currentCardIndex = 0;
+
+        // Fetch all decks
+        async function fetchDecks() {
+            const response = await fetch('/api/decks');
+            const decks = await response.json();
+            decksSelect.innerHTML = decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
+            currentDeckId = decks[0]?.id || null;
+            if (currentDeckId) fetchCards(currentDeckId);
+        }
+
+        // Fetch cards for a selected deck
+        async function fetchCards(deckId) {
+            const response = await fetch(`/api/decks/${deckId}/cards`);
+            currentCards = await response.json();
+            currentCardIndex = 0;
+            if (currentCards.length) {
+                showCard(currentCardIndex);
+            } else {
+                flashcard.classList.add('hidden');
+            }
+        }
+
+        // Show card by index
+        function showCard(index) {
+            flashcard.classList.remove('hidden');
+            front.textContent = currentCards[index].front;
+            back.textContent = currentCards[index].back;
+            back.classList.add('hidden');
+        }
+
+        // Flip card logic
+        flashcard.addEventListener('click', () => {
+            front.classList.toggle('hidden');
+            back.classList.toggle('hidden');
+        });
+
+        // Handle deck change
+        decksSelect.addEventListener('change', (e) => {
+            currentDeckId = e.target.value;
+            fetchCards(currentDeckId);
+        });
+
+        // Initial fetch
+        fetchDecks();
+    </script>
+</body>
 </html>
