@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             padding: 20px;
         }
-        #decks {
+        .container {
             margin-bottom: 20px;
         }
         .flashcard {
@@ -29,24 +29,67 @@
         .hidden {
             display: none;
         }
+        form {
+            margin-top: 20px;
+        }
+        form div {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Flashcards</h1>
-    <label for="decks">Choose a Deck:</label>
-    <select id="decks">
-        <!-- Decks will be dynamically populated -->
-    </select>
+
+    <!-- Select Deck -->
+    <div class="container">
+        <label for="decks">Choose a Deck:</label>
+        <select id="decks"></select>
+        <button id="add-deck-btn">Add Deck</button>
+    </div>
+
+    <!-- Flashcard Display -->
     <div id="flashcard" class="flashcard hidden">
         <div id="front" class="card-side"></div>
         <div id="back" class="card-side hidden"></div>
     </div>
+
+    <!-- Add/Edit Deck Form -->
+    <form id="deck-form" class="hidden">
+        <h2 id="deck-form-title">Add Deck</h2>
+        <div>
+            <label for="deck-name">Deck Name:</label>
+            <input type="text" id="deck-name" required />
+        </div>
+        <button type="submit">Save Deck</button>
+    </form>
+
+    <!-- Add/Edit Flashcard Form -->
+    <form id="flashcard-form" class="hidden">
+        <h2 id="flashcard-form-title">Add Flashcard</h2>
+        <div>
+            <label for="card-front">Front:</label>
+            <input type="text" id="card-front" required />
+        </div>
+        <div>
+            <label for="card-back">Back:</label>
+            <input type="text" id="card-back" required />
+        </div>
+        <button type="submit">Save Flashcard</button>
+    </form>
 
     <script>
         const decksSelect = document.getElementById('decks');
         const flashcard = document.getElementById('flashcard');
         const front = document.getElementById('front');
         const back = document.getElementById('back');
+        const deckForm = document.getElementById('deck-form');
+        const flashcardForm = document.getElementById('flashcard-form');
+        const deckFormTitle = document.getElementById('deck-form-title');
+        const flashcardFormTitle = document.getElementById('flashcard-form-title');
+        const addDeckBtn = document.getElementById('add-deck-btn');
+        const deckNameInput = document.getElementById('deck-name');
+        const cardFrontInput = document.getElementById('card-front');
+        const cardBackInput = document.getElementById('card-back');
 
         let currentDeckId = null;
         let currentCards = [];
@@ -91,6 +134,52 @@
         decksSelect.addEventListener('change', (e) => {
             currentDeckId = e.target.value;
             fetchCards(currentDeckId);
+        });
+
+        // Show Add Deck Form
+        addDeckBtn.addEventListener('click', () => {
+            deckForm.classList.remove('hidden');
+            deckFormTitle.textContent = 'Add Deck';
+        });
+
+        // Save Deck
+        deckForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const deckName = deckNameInput.value.trim();
+            if (deckName) {
+                await fetch('/api/decks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: deckName }),
+                });
+                deckNameInput.value = '';
+                deckForm.classList.add('hidden');
+                fetchDecks();
+            }
+        });
+
+        // Show Add Flashcard Form
+        flashcard.addEventListener('dblclick', () => {
+            flashcardForm.classList.remove('hidden');
+            flashcardFormTitle.textContent = 'Add Flashcard';
+        });
+
+        // Save Flashcard
+        flashcardForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const frontText = cardFrontInput.value.trim();
+            const backText = cardBackInput.value.trim();
+            if (frontText && backText) {
+                await fetch(`/api/decks/${currentDeckId}/cards`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ front: frontText, back: backText }),
+                });
+                cardFrontInput.value = '';
+                cardBackInput.value = '';
+                flashcardForm.classList.add('hidden');
+                fetchCards(currentDeckId);
+            }
         });
 
         // Initial fetch
