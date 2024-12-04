@@ -79,6 +79,8 @@ function main() {
         response.sendFile('static/index.html', { root: '.' });
     });
 
+    app.use('/static', express.static('static'));
+
     app.post('/api/decks', (request, response) => {
         const { name } = request.body;
 
