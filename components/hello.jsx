@@ -13,11 +13,11 @@ function App() {
   const [cardFront, setCardFront] = React.useState('');
   const [cardBack, setCardBack] = React.useState('');
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchDecks();
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (currentDeckId) {
       fetchCards(currentDeckId);
     }
