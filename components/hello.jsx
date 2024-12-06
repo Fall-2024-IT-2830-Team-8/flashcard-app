@@ -136,9 +136,9 @@ function App() {
         <button onClick={() => setShowDeckForm(true)}>Add Deck</button>
         <button onClick={() => setShowFlashcardForm(true)}>Add Card</button>
       </div>
-      {cards.length > 0 && (
+      {cards.map(card =>
         <div className="flashcard" onClick={handleCardClick}>
-          {isFront ? cards[currentCardIndex]?.front : cards[currentCardIndex]?.back}
+          {isFront ? card.front : card.back}
         </div>
       )}
       
