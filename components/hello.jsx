@@ -237,7 +237,7 @@ function App() {
                 </div>
             </div>
             <main>
-                {credentialHash || <p>Please log in to view decks.</p>}
+                {credentialHash == "" && <p>Please log in to view decks.</p>}
                 {credentialHash && (
                     <MainApp
                         username={username}
