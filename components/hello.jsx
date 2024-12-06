@@ -36,6 +36,7 @@ function App() {
     const data = await response.json();
     setCards(data.cards);
     setCurrentCardIndex(0);
+    console.log(data.cards);
   };
 
   const handleDeckChange = (e) => {
@@ -69,6 +70,7 @@ function App() {
     setCardBack('');
     setShowFlashcardForm(false);
     fetchCards(currentDeckId);
+    console.log('see if work');
   };
 
   const handleLoginSubmit = async (e) => {
@@ -132,12 +134,14 @@ function App() {
           ))}
         </select>
         <button onClick={() => setShowDeckForm(true)}>Add Deck</button>
+        <button onClick={() => setShowFlashcardForm(true)}>Add Card</button>
       </div>
       {cards.length > 0 && (
         <div className="flashcard" onClick={handleCardClick}>
           {isFront ? cards[currentCardIndex]?.front : cards[currentCardIndex]?.back}
         </div>
       )}
+      
       {showDeckForm && (
         <form onSubmit={handleDeckFormSubmit}>
           <h2>Add Deck</h2>
