@@ -70,7 +70,6 @@ function App() {
     setShowFlashcardForm(false);
     fetchCards(currentDeckId);
   };
-
   return (
     <div>
       <div className="header">
@@ -85,6 +84,7 @@ function App() {
         <label htmlFor="password">Password</label>
         <input
           id="password"
+          type='password'
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
