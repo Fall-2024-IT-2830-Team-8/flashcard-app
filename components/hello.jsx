@@ -6,6 +6,7 @@ function App() {
   const [isFront, setIsFront] = React.useState(true);
   const [showDeckForm, setShowDeckForm] = React.useState(false);
   const [showFlashcardForm, setShowFlashcardForm] = React.useState(false);
+  const [currentUser, setCurrentUser] = React.useState('');
 
   const [deckName, setDeckName] = React.useState('');
   const [cardFront, setCardFront] = React.useState('');
@@ -73,11 +74,15 @@ function App() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     const credentialHash = md5(`${username}${password}`); // username is the salt
-    await fetch(`/api/users`, {
+    const response = await fetch(`/api/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'validate', username: username, credentialHash: credentialHash}),
     });
+    const data = await response.json();
+    if (data.status == "success") {
+      setCurrentUser(data.username);
+    }
   }
 
   const handleCreateAccount = async (e) => {
@@ -93,23 +98,28 @@ function App() {
   return (
     <div>
       <div className="header">
-        <label htmlFor="username">Username</label>
+        <div className="current-user">
+          {currentUser != '' ? currentUser : 'Not logged in'}
+        </div>
+        <div className="login-form">
+          <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          <label htmlFor="password">Password</label>
           <input
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="password"
+            type='password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type='password'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button onClick={handleLoginSubmit}>Login</button>
-        <button onClick={handleCreateAccount}>Create Account</button>
+          <button onClick={handleLoginSubmit}>Login</button>
+          <button onClick={handleCreateAccount}>Create Account</button>
+        </div>
       </div>
       <h1>Flashcards</h1>
       <div className="container">

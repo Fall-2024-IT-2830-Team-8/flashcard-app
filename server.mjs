@@ -174,7 +174,7 @@ function main() {
         if (action === 'validate') {
             const [ userid ] = validateUser(db, username, credentialHash);
             response.status(200);
-            response.json({ status: (userid === undefined)? 'failure' : 'success'})
+            response.json({ status: (userid === undefined)? 'failure' : 'success', username: username});
             return;
         }
 

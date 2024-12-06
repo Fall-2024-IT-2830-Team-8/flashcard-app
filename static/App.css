@@ -24,28 +24,32 @@ body {
 
 .header {
   display: flex;
-  justify-content: flex-end; 
-  align-items: center; 
-  gap: 5px;
-  background-color: lightgrey; 
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background-color: lightgrey;
   padding: 10px;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
 }
 
-.login-form label {
-  display: block;
-  margin-top: 2px;
+.logged-in-user {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.login-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .login-form input {
-  display: inline-block; 
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 
-.header button {
-  align-self: center;
+.login-form button {
+  margin-left: 10px;
 }
