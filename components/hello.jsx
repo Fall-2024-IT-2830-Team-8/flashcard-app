@@ -75,25 +75,21 @@ function App() {
     <div>
       <div className="header">
         <button onClick={() => setShowLoginForm(true)}>Login</button>
-      </div>
-      {showLoginForm && (
-        <div className="login-form">
-          <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          <label htmlFor="password">Password</label>
+        <label htmlFor="username">Username</label>
           <input
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
-        </div>
-      )}
+        <label htmlFor="password">Password</label>
+        <input
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
       <h1>Flashcards</h1>
       <div className="container">
         <label htmlFor="decks">Choose a Deck:</label>

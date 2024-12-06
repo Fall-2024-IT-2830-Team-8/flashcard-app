@@ -22,12 +22,30 @@ body {
   cursor: pointer;
 }
 
+.header {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center; 
+  gap: 5px;
+  background-color: lightgrey; 
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
 .login-form label {
   display: block;
-  margin-top: 10px;
+  margin-top: 2px;
 }
 
 .login-form input {
-  display: block; 
-  margin-bottom: 10px;
+  display: inline-block; 
+  margin-bottom: 2px;
+}
+
+.header button {
+  align-self: center;
 }
