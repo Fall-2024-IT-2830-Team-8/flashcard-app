@@ -5,7 +5,6 @@ function App() {
   const [currentCardIndex, setCurrentCardIndex] = React.useState(0);
   const [isFront, setIsFront] = React.useState(true);
   const [showDeckForm, setShowDeckForm] = React.useState(false);
-  const [showLoginForm, setShowLoginForm] = React.useState(false);
   const [showFlashcardForm, setShowFlashcardForm] = React.useState(false);
 
   const [deckName, setDeckName] = React.useState('');
@@ -70,10 +69,20 @@ function App() {
     setShowFlashcardForm(false);
     fetchCards(currentDeckId);
   };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    const credentialHash = 'evil hash...';
+    await fetch(`/api/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'validate', username: username, credentialHash: credentialHash}),
+    });
+  }
+
   return (
     <div>
-      <div className="header">
-        <button onClick={() => setShowLoginForm(true)}>Login</button>
+      <form onSubmit={handleLoginSubmit} className="header">
         <label htmlFor="username">Username</label>
           <input
             id="username"
@@ -89,7 +98,8 @@ function App() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-      </div>
+        <button type="submit">Login</button>
+      </form>
       <h1>Flashcards</h1>
       <div className="container">
         <label htmlFor="decks">Choose a Deck:</label>
