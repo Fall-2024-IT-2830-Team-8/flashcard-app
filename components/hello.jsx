@@ -74,7 +74,7 @@ function App() {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const credentialHash = 'evil hash...';
+    const credentialHash = md5(`${username}${password}`); // username is the salt
     await fetch(`/api/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,9 +82,19 @@ function App() {
     });
   }
 
+  const handleCreateAccount = async (e) => {
+    e.preventDefault();
+    const credentialHash = md5(`${username}${password}`); // username is the salt
+    await fetch(`/api/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', username: username, credentialHash: credentialHash}),
+    });
+  }
+
   return (
     <div>
-      <form onSubmit={handleLoginSubmit} className="header">
+      <div className="header">
         <label htmlFor="username">Username</label>
           <input
             id="username"
@@ -100,8 +110,9 @@ function App() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Login</button>
-      </form>
+        <button onClick={handleLoginSubmit}>Login</button>
+        <button onClick={handleCreateAccount}>Create Account</button>
+      </div>
       <h1>Flashcards</h1>
       <div className="container">
         <label htmlFor="decks">Choose a Deck:</label>
