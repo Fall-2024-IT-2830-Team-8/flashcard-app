@@ -1,5 +1,3 @@
-
-
 function App() {
   const [decks, setDecks] = React.useState([]);
   const [currentDeckId, setCurrentDeckId] = React.useState(null);
@@ -7,11 +5,14 @@ function App() {
   const [currentCardIndex, setCurrentCardIndex] = React.useState(0);
   const [isFront, setIsFront] = React.useState(true);
   const [showDeckForm, setShowDeckForm] = React.useState(false);
+  const [showLoginForm, setShowLoginForm] = React.useState(false);
   const [showFlashcardForm, setShowFlashcardForm] = React.useState(false);
 
   const [deckName, setDeckName] = React.useState('');
   const [cardFront, setCardFront] = React.useState('');
   const [cardBack, setCardBack] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
   React.useEffect(() => {
     fetchDecks();
@@ -72,6 +73,27 @@ function App() {
 
   return (
     <div>
+      <div className="header">
+        <button onClick={() => setShowLoginForm(true)}>Login</button>
+      </div>
+      {showLoginForm && (
+        <div className="login-form">
+          <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+      )}
       <h1>Flashcards</h1>
       <div className="container">
         <label htmlFor="decks">Choose a Deck:</label>
