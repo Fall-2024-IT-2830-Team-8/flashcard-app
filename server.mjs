@@ -92,6 +92,34 @@ function validateUser(db, username, credentialHash) {
     return result;
 }
 
+function authorizeRequest(db, auth, response) {
+    console.log(auth);
+
+    if (auth === undefined) {
+        response.status(401);
+        response.json({ status: 'failure', error: 'auth not provided.' });
+        return false;
+    }
+
+    const [ _, username, credentialHash ] = auth.split(' ');
+
+    if ([username, credentialHash].includes(undefined)) {
+        response.status(401);
+        response.json({ status: 'failure', error: 'auth does not include username and credentialHash.' });
+        return false;
+    }
+
+    const [ userid ] = validateUser(db, username, credentialHash);
+
+    if (userid === undefined) {
+        response.status(401);
+        response.json({ status: 'failure', error: 'user with username and credentialHash not found.' });
+        return false;
+    }
+
+    return true;
+}
+
 
 function main() {
     let db = new Database('flashcards.db', { verbose: console.debug });
@@ -110,6 +138,9 @@ function main() {
 
     app.post('/api/decks', (request, response) => {
         const { name } = request.body;
+        const { authorization } = request.headers;
+
+        if (!authorizeRequest(db, authorization, response)) return;
 
         if (name === undefined) {
             response.status(400);
@@ -123,6 +154,10 @@ function main() {
     });
 
     app.get('/api/decks', (request, response) => {
+        const { authorization } = request.headers;
+
+        if (!authorizeRequest(db, authorization, response)) return;
+
         let decks = getDecks(db);
         response.status(200);
         response.json({ status: 'success', decks });
@@ -130,6 +165,9 @@ function main() {
 
     app.get('/api/decks/:deckId/cards', (request, response) => {
         const { deckId } = request.params;
+        const { authorization } = request.headers;
+
+        if (!authorizeRequest(db, authorization, response)) return;
 
         let cards = getCardsInDeck(db, deckId);
         response.status(200);
@@ -138,11 +176,12 @@ function main() {
 
     app.post('/api/decks/:deckId/cards', (request, response) => {
         const { front, back } = request.body;
+        const { authorization } = request.headers;
         let { deckId } = request.params;
 
-        deckId = parseInt(deckId);
+        if (!authorizeRequest(db, authorization, response)) return;
 
-        console.log([deckId, front, back]);
+        deckId = parseInt(deckId);
 
         if ([front, back].includes(undefined) || deckId === NaN) {
             response.status(400);
@@ -174,7 +213,7 @@ function main() {
         if (action === 'validate') {
             const [ userid ] = validateUser(db, username, credentialHash);
             response.status(200);
-            response.json({ status: (userid === undefined)? 'failure' : 'success', username: username});
+            response.json({ status: (userid === undefined)? 'failure' : 'success' });
             return;
         }
 
