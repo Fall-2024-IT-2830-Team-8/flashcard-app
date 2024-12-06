@@ -1,9 +1,18 @@
+function Flashcard({ id, front, back }) {
+    const [isFront, setIsFront] = React.useState(true);
+
+    return (
+        <div className="flashcard" key={id} onClick={() => setIsFront(!isFront)}>
+            {isFront ? front : back}
+        </div>
+    )
+}
+
 function App() {
   const [decks, setDecks] = React.useState([]);
   const [currentDeckId, setCurrentDeckId] = React.useState(null);
   const [cards, setCards] = React.useState([]);
   const [currentCardIndex, setCurrentCardIndex] = React.useState(0);
-  const [isFront, setIsFront] = React.useState(true);
   const [showDeckForm, setShowDeckForm] = React.useState(false);
   const [showFlashcardForm, setShowFlashcardForm] = React.useState(false);
   const [currentUser, setCurrentUser] = React.useState('');
@@ -41,10 +50,6 @@ function App() {
 
   const handleDeckChange = (e) => {
     setCurrentDeckId(e.target.value);
-  };
-
-  const handleCardClick = () => {
-    setIsFront(!isFront);
   };
 
   const handleDeckFormSubmit = async (e) => {
@@ -136,11 +141,7 @@ function App() {
         <button onClick={() => setShowDeckForm(true)}>Add Deck</button>
         <button onClick={() => setShowFlashcardForm(true)}>Add Card</button>
       </div>
-      {cards.map(card =>
-        <div className="flashcard" onClick={handleCardClick}>
-          {isFront ? card.front : card.back}
-        </div>
-      )}
+      {cards.map(card => <Flashcard front={card.front} back={card.back} />)}
       
       {showDeckForm && (
         <form onSubmit={handleDeckFormSubmit}>
